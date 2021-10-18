@@ -27,14 +27,14 @@ export const createGenesisBlock = () => {
 }
 
 
-const hash = (timestamp: number, lastHash: string, data: string) => {
+const computeHash = (timestamp: number, lastHash: string, data: string) => {
   return sha256(`${timestamp}${lastHash}${data}`).toString();
 }
 
 export const mineBlock = (lastBlock: BlockType, data: string) => {
-  let hash;
-  let timestamp;
+  let timestamp: number = Math.floor(new Date().getTime()); // epoch in ms
   const lastHash = lastBlock.hash;
+  let hash: string = computeHash(timestamp, lastHash, data);
 
   return createNewBlock(timestamp, lastHash, hash, data);
 }
@@ -43,8 +43,8 @@ export const mineBlock = (lastBlock: BlockType, data: string) => {
 export const blockToString = (block: BlockType) => {
   return `Block - 
   Timestamp : ${block.timestamp} 
-  Last Hash : ${block.lastHash.substring(0,19)} 
-  Hash      : ${block.hash} 
+  Last Hash : ${block.lastHash.substring(0,10)} 
+  Hash      : ${block.hash.substring(0,10)} 
   Data      : ${block.data}`;
 }
 
@@ -52,7 +52,7 @@ export const blockToString = (block: BlockType) => {
 export const recomputeHashForBlock = (block: BlockType) => {
   // decomposing
   const { timestamp, lastHash, data} = block;
-  return hash(timestamp, lastHash, data);
+  return computeHash(timestamp, lastHash, data);
 }
 
 

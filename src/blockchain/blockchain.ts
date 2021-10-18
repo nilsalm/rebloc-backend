@@ -6,9 +6,10 @@ export interface ChainType {
 }
 
 export const newChain = () => {
-  let c: ChainType;
-  c.chain = [createGenesisBlock()];
-  c.meta = "Nils chain"
+  let c: ChainType = {
+    chain : [createGenesisBlock()],
+    meta : "Nils chain"
+  }
   return c
 }
 

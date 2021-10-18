@@ -1,7 +1,7 @@
 import sha256 from "crypto-js/sha256";
 
 
-interface BlockType {
+export interface BlockType {
   timestamp: number; // the time of creation of block in milliseconds
   lastHash: string; // hash of the last block on the chain
   hash: string; // hash of the current block
@@ -11,7 +11,7 @@ interface BlockType {
 // var timestamp = Math.floor(new Date().getTime()); // epoch in ms
 
 
-const createNewBlock = (timestamp: number, lastHash: string, hash: string, data: string) => {
+export const createNewBlock = (timestamp: number, lastHash: string, hash: string, data: string) => {
   const block: BlockType = {
     timestamp: timestamp,
     lastHash: lastHash,
@@ -22,7 +22,7 @@ const createNewBlock = (timestamp: number, lastHash: string, hash: string, data:
 }
 
 
-const createGenesisBlock = () => {
+export const createGenesisBlock = () => {
   return createNewBlock(0, '----', 'genesis hash', 'genesis')
 }
 
@@ -32,7 +32,7 @@ const hash = (timestamp: number, lastHash: string, data: string) => {
 }
 
 
-const mineBlock = (lastBlock: BlockType, data: string) => {
+export const mineBlock = (lastBlock: BlockType, data: string) => {
   let hash;
   let timestamp;
   const lastHash = lastBlock.hash;

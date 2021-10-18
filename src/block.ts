@@ -11,7 +11,7 @@ export interface BlockType {
 // var timestamp = Math.floor(new Date().getTime()); // epoch in ms
 
 
-export const createNewBlock = (timestamp: number, lastHash: string, hash: string, data: string) => {
+const createNewBlock = (timestamp: number, lastHash: string, hash: string, data: string) => {
   const block: BlockType = {
     timestamp: timestamp,
     lastHash: lastHash,
@@ -31,7 +31,6 @@ const hash = (timestamp: number, lastHash: string, data: string) => {
   return sha256(`${timestamp}${lastHash}${data}`).toString();
 }
 
-
 export const mineBlock = (lastBlock: BlockType, data: string) => {
   let hash;
   let timestamp;
@@ -48,4 +47,12 @@ export const blockToString = (block: BlockType) => {
   Hash      : ${block.hash} 
   Data      : ${block.data}`;
 }
+
+
+export const recomputeHashForBlock = (block: BlockType) => {
+  // decomposing
+  const { timestamp, lastHash, data} = block;
+  return hash(timestamp, lastHash, data);
+}
+
 

@@ -68,7 +68,7 @@ const P2PMessageHandler = (p2pServer: P2PServerType, socket: WebSocket) => {
   //on recieving a message execute a callback function
   socket.on('message', message =>{
     const data = JSON.parse(message.toString());
-    console.log("data ", data);
+    // console.log("data ", data);
 
     const newChain: ChainType = {
       chain: data,

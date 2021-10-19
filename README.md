@@ -15,6 +15,10 @@ Then you can use postman to trigger the different endpoints, either to get the b
 - `localhost:3001/blocks` (or 3002, 3003) to get the blockchain of the given node -> should be the same for all!
 - `localhost:3001/mine` (or 3002, 3003) with a JSON-payload like `{"data" : "foo"}` -> should sync to all other nodes.
   
+# Dockerize
+- to build docker-container: `docker build -t blocks .`
+- to run docker container: `docker run -p 3001:3001 blocks`
+
 
 ## TODO
 - [x] Build basic blockchain (part 2) 
@@ -23,4 +27,5 @@ Then you can use postman to trigger the different endpoints, either to get the b
 - [x] Build P2P synchronisation (part 4)
 - [x] Implement difficulty, nonce, (part 5)
 - [ ] Write tests with jest (get them running)
+- [x] Dockerize
 - [ ] Host on different nodes (raspi, digitalocean, laptop)

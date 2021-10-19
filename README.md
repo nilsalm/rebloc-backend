@@ -21,6 +21,6 @@ Then you can use postman to trigger the different endpoints, either to get the b
 - [x] Refactor into functional style with typescript
 - [x] Make into simple webservre (part 3)
 - [x] Build P2P synchronisation (part 4)
-- [ ] Implement difficulty, nonce, (part 5)
+- [x] Implement difficulty, nonce, (part 5)
 - [ ] Write tests with jest (get them running)
 - [ ] Host on different nodes (raspi, digitalocean, laptop)

@@ -39,7 +39,7 @@ export const isValidChain = (blockchain: ChainType) => {
   return true;
 }
 
-export const replaceChain = (currentChain:ChainType, newChain: ChainType) => {
+export const replaceChain = (currentChain: ChainType, newChain: ChainType) => {
   if (newChain.chain.length <= currentChain.chain.length) {
     console.log("Received chain is not longer than the current chain.");
     return currentChain;

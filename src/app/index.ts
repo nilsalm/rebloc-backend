@@ -4,7 +4,7 @@ import express from "express";
 import { newP2PServer, P2PServerListen, P2PSyncChain } from "./p2pServer";
 
 
-const HTTP_PORT = process.env.HTTP_PORT || 3001;
+const HTTP_PORT = process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT) : 3001;
 
 // we can run our app something like the following to run on a
 // different port: 

@@ -1,5 +1,5 @@
 import { arrayBuffer } from "stream/consumers";
-import WebSocket from "ws"
+import WebSocket, { OPEN } from "ws"
 import { ChainType, replaceChain } from "../blockchain/blockchain";
 require("dotenv").config()
 
@@ -48,33 +48,39 @@ export const P2PServerListen = (p2pServer: P2PServerType) => {
 // after making connection to a socket
 const P2PConnectSocket = (p2pServer: P2PServerType, socket: WebSocket) => {
   // push the socket too the socket array
+
+  if (socket.url == null) {
+    let idx = p2pServer.sockets.indexOf(socket)
+    p2pServer.sockets.splice(idx, 1)
+  }
+
+  console.log("Socket connected", socket.url)
+
   p2pServer.sockets.push(socket)
-  console.log("Socket connected");
-  
+
   // register a message event listener to the socket
   P2PMessageHandler(p2pServer, socket);
 
   // on new connection send the blockchain chain to the peer
   P2PSendChain(p2pServer, socket);
+  // P2PSendPeer(p2pServer, socket)
 }
 
 const P2PConnectToPeers = (p2pServer: P2PServerType) => {
   //connect to each peer
   p2pServer.peers.forEach(peer => {
     // only open a new connection if there is no existing one
-    if (p2pServer.sockets.some(item => item.url === peer) == false) {
+    if (p2pServer.sockets.some(socket => socket.url === peer) == false) {
       // create a socket for each peer
       const socket = new WebSocket(peer);
       
       // open event listner is emitted when a connection is established
       // saving the socket in the array
-      socket.on('open',() => {
+      socket.on('open', () => {
         P2PConnectSocket(p2pServer, socket)
         P2PSendPeer(p2pServer, socket)
       });
     }
-
-
   });
 }
 
@@ -107,8 +113,6 @@ const P2PMessageHandler = (p2pServer: P2PServerType, socket: WebSocket) => {
       default:
         break;
     }
-
-    
   });
 }
 

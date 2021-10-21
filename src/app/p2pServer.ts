@@ -1,6 +1,6 @@
 import WebSocket from "ws"
 import { ChainType, replaceChain } from "../blockchain/blockchain";
-
+require("dotenv").config()
 
 //declare the peer to peer server port 
 const P2P_PORT = process.env.P2P_PORT ? parseInt(process.env.P2P_PORT) : 5001;

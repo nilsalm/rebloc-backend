@@ -1,3 +1,4 @@
+import { arrayBuffer } from "stream/consumers";
 import WebSocket from "ws"
 import { ChainType, replaceChain } from "../blockchain/blockchain";
 require("dotenv").config()
@@ -9,15 +10,22 @@ const P2P_PORT = process.env.P2P_PORT ? parseInt(process.env.P2P_PORT) : 5001;
 //list of address to connect to
 const peers = process.env.PEERS ? process.env.PEERS.split(',') : [];
 
+// Adding the home node to peers
+if (P2P_PORT !== 5001) [
+  peers.push("ws://localhost:5001")
+]
+
 export interface P2PServerType {
   blockchain: ChainType;
   sockets: Array<WebSocket>;
+  peers: string[];
 }
 
 export const newP2PServer = (blockchain: ChainType) => {
   const server: P2PServerType = {
     blockchain: blockchain,
-    sockets: []
+    sockets: [],
+    peers: [...peers]
   }
   return server
 }
@@ -52,29 +60,55 @@ const P2PConnectSocket = (p2pServer: P2PServerType, socket: WebSocket) => {
 
 const P2PConnectToPeers = (p2pServer: P2PServerType) => {
   //connect to each peer
-  peers.forEach(peer => {
+  p2pServer.peers.forEach(peer => {
+    // only open a new connection if there is no existing one
+    if (p2pServer.sockets.some(item => item.url === peer) == false) {
+      // create a socket for each peer
+      const socket = new WebSocket(peer);
+      
+      // open event listner is emitted when a connection is established
+      // saving the socket in the array
+      socket.on('open',() => {
+        P2PConnectSocket(p2pServer, socket)
+        P2PSendPeer(p2pServer, socket)
+      });
+    }
 
-    // create a socket for each peer
-    const socket = new WebSocket(peer);
-    
-    // open event listner is emitted when a connection is established
-    // saving the socket in the array
-    socket.on('open',() => P2PConnectSocket(p2pServer, socket));
 
   });
 }
 
 const P2PMessageHandler = (p2pServer: P2PServerType, socket: WebSocket) => {
   //on recieving a message execute a callback function
-  socket.on('message', message =>{
+  socket.on('message', message => {
     const data = JSON.parse(message.toString());
     // console.log("data ", data);
 
-    const newChain: ChainType = {
-      chain: data,
-      meta: "new chain"
+    switch (data.type) {
+      case "chain":
+        const newChain: ChainType = {
+          chain: JSON.parse(data.data),
+          meta: "new chain"
+        }
+        p2pServer.blockchain = replaceChain(p2pServer.blockchain, newChain)
+        break;
+      
+      case "peers":
+        let newPeers = JSON.parse(data.data)
+        let oldPeers = p2pServer.peers;
+        
+        p2pServer.peers = updatePeers(p2pServer.peers, newPeers)
+        
+        if (oldPeers.length < p2pServer.peers.length) {
+          P2PConnectToPeers(p2pServer)
+        }
+        break;
+    
+      default:
+        break;
     }
-    p2pServer.blockchain = replaceChain(p2pServer.blockchain, newChain)
+
+    
   });
 }
 
@@ -84,7 +118,11 @@ const P2PMessageHandler = (p2pServer: P2PServerType, socket: WebSocket) => {
  */
 
 const P2PSendChain = (p2pServer: P2PServerType, socket: WebSocket) => {
-    socket.send(JSON.stringify(p2pServer.blockchain.chain));
+  let msg = {
+    type: "chain",
+    data: JSON.stringify(p2pServer.blockchain.chain)
+  }
+  socket.send(JSON.stringify(msg));
 }
 
 /**
@@ -94,9 +132,44 @@ const P2PSendChain = (p2pServer: P2PServerType, socket: WebSocket) => {
  */
 
 export const P2PSyncChain = (p2pServer: P2PServerType) => {
-    p2pServer.sockets.forEach(socket =>{
-        P2PSendChain(p2pServer, socket);
-    });
+  p2pServer.sockets.forEach(socket =>{
+    P2PSendChain(p2pServer, socket);
+  });
 }
 
- 
+
+
+/**
+ * helper function to send the list of peers
+ */
+
+const P2PSendPeer = (p2pServer: P2PServerType, socket: WebSocket) => {
+  let msg = {
+    type: "peers",
+    data: JSON.stringify([...p2pServer.peers, getMyAdress()])
+  }
+  socket.send(JSON.stringify(msg));
+}
+
+/**
+ * utility functions to sync the peers
+ * whenever a new peer is added to the network
+ */
+
+const updatePeers = (currentPeers: string[], newPeers: string[]) => {
+  let array = [...currentPeers, ...newPeers];
+  let uniq = Array.from(new Set(array));
+  return removeOwnAdress(uniq)
+}
+
+const removeOwnAdress = (array: string[]) => {
+  let idx = array.indexOf(getMyAdress())
+  if (idx > -1) {
+    array.splice(idx, 1)
+  }
+  return array
+}
+
+const getMyAdress = () => {
+  return `ws://localhost:${P2P_PORT}`
+}

@@ -1,6 +1,8 @@
 import { newChain, addBlockToChain } from "../blockchain/blockchain";
 import { blockToString } from "../blockchain/block";
 import express from "express";
+import cors from "cors"
+import { createProxyMiddleware } from "http-proxy-middleware";
 import { newP2PServer, P2PServerListen, P2PSyncChain } from "./p2pServer";
 
 
@@ -17,6 +19,9 @@ const app = express();
 //using the blody parser middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+app.use(cors())
+
 
 // create a new blockchain instance
 const blockchain = newChain();

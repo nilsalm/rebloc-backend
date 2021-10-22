@@ -6,13 +6,14 @@ require("dotenv").config()
 //declare the peer to peer server port 
 const P2P_PORT = process.env.P2P_PORT ? parseInt(process.env.P2P_PORT) : 5001;
 
+const LOCALHOST = process.env.LOCALHOST || 'localhost';
 
 //list of address to connect to
 const peers = process.env.PEERS ? process.env.PEERS.split(',') : [];
 
 // Adding the home node to peers
 if (P2P_PORT !== 5001) [
-  peers.push("ws://localhost:5001")
+  peers.push(`ws://${LOCALHOST}:5001`)
 ]
 
 export interface P2PServerType {
@@ -175,5 +176,5 @@ const removeOwnAdress = (array: string[]) => {
 }
 
 const getMyAdress = () => {
-  return `ws://localhost:${P2P_PORT}`
+  return `ws://${LOCALHOST}:${P2P_PORT}`
 }

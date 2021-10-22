@@ -35,7 +35,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: user/app:latest
+          tags: nilsweber/block:latest
 
     # # Steps represent a sequence of tasks that will be executed as part of the job
     # steps:

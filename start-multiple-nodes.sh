@@ -1,8 +1,20 @@
+#!/bin/sh
 P2P_PORT_BASE=5001
 HTTP_PORT_BASE=3001
 PEERS=
 
-for i in 0 1 2 3
+echo "Killing all previous docker containers"
+docker kill $(docker ps -q)
+echo "Removing all previous docker containers"
+docker rm $(docker ps -a -q)
+
+last=2
+if [[ $# -gt 0 ]]
+then 
+  last=$1
+fi
+
+for i in $(seq 0 $last)
 do
 
   P2P_PORT=$(expr $P2P_PORT_BASE + $i)
@@ -18,7 +30,7 @@ do
     -e PEERS=$PEERS \
     --name blocks-${P2P_PORT} \
     -d \
-    nilsweber/blocks 
+    nilsweber/blocks
 
   last_peer="ws://host.docker.internal:${P2P_PORT}"
   if [ $i == 0 ]; then
@@ -26,5 +38,5 @@ do
   else
     PEERS="${PEERS},${last_peer}"
   fi
-  
+
 done

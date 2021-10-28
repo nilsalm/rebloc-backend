@@ -2,3 +2,4 @@ node_modules
 README.md
 build
 start-multiple-nodes.sh
+.env

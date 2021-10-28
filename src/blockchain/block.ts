@@ -12,9 +12,6 @@ export interface BlockType {
   difficulty: number;   // measure to describe the mining difficulty
 }
 
-// var timestamp = Math.floor(new Date().getTime()); // epoch in ms
-
-
 const createNewBlock = (timestamp: number, lastHash: string, hash: string, data: string, nonce: number, difficulty: number) => {
   const block: BlockType = {
     timestamp: timestamp,
@@ -27,11 +24,9 @@ const createNewBlock = (timestamp: number, lastHash: string, hash: string, data:
   return block;
 }
 
-
 export const createGenesisBlock = () => {
   return createNewBlock(0, '----', 'genesis hash', 'genesis', 0, DIFFICULTY)
 }
-
 
 const computeHash = (timestamp: number, lastHash: string, data: string, nonce: number, difficulty: number) => {
   return sha256(`${nonce}${difficulty}${timestamp}${lastHash}${data}`).toString();
@@ -43,7 +38,6 @@ export const mineBlock = (lastBlock: BlockType, data: string) => {
   let nonce = 0;
   let difficulty: number;
   let hash: string;
-
 
   //generate the hash of the block
   do {
@@ -58,7 +52,6 @@ export const mineBlock = (lastBlock: BlockType, data: string) => {
   return createNewBlock(timestamp, lastHash, hash, data, nonce, difficulty);
 }
 
-
 export const blockToString = (block: BlockType) => {
   return `Block - 
   Timestamp  : ${block.timestamp} 
@@ -68,7 +61,6 @@ export const blockToString = (block: BlockType) => {
   Nonce      : ${block.nonce}
   Difficulty : ${block.difficulty}`;
 }
-
 
 export const recomputeHashForBlock = (block: BlockType) => {
   // decomposing
